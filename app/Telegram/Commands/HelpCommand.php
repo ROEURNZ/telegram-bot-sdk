@@ -9,9 +9,9 @@ use Telegram\Bot\Commands\Command;
  * This command can be triggered in two ways:
  * /start and /join due to the alias.
  */
-class StartCommand extends Command
+class HelpCommand extends Command
 {
-    protected string $name = 'start';
+    protected string $name = 'help';
     protected array $aliases = ['join'];
     protected string $description = 'Start Command to get you started';
     protected string $pattern = '{username}

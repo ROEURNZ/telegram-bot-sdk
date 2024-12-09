@@ -2,8 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TelegramController;
+use App\Http\Controllers\Telegram\TelegramController;
 use Telegram\Bot\Laravel\Facades\Telegram;
+use App\Services\TelegramCommandService;
+
 
 
 Route::get('/user', function (Request $request) {
@@ -19,8 +21,10 @@ Route::prefix('telegram/webhooks')->group(function () {
 
     Route::post('inbound', [TelegramController::class, 'inbound'])->name('telegram.inbound');
 
-    // Route::post('/webhooks', function () {
-    //     $update = Telegram::commandsHandler(true);
-    //     return 'OK';
-    // });
 });
+
+
+Route::get('/set-telegram-menu', function (TelegramCommandService $telegramService) {
+    return $telegramService->setCommandMenu();
+});
+

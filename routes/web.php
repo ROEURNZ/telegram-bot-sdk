@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
-use Telegram\Bot\Laravel\Facades\Telegram;
 use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
@@ -10,14 +8,6 @@ Route::get('/', function () {
 });
 
 
-Route::post('/webhook', function () {
-    Log::info('Webhook method:', ['method' => request()->method()]);
-
-    $update = Telegram::getWebhookUpdate();
-    $handler = new \App\Telegram\WebhookHandler();
-    $handler->handle($update);
-    return response()->json(['status' => 'ok']);
-});
 
 Route::get('/dashboard', function () {
     return view('dashboard');
