@@ -2,12 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\LanguageController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-
+Route::get('/switch-locale/{locale}',[LanguageController::class,'swichLocale'])->name('switch-language');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

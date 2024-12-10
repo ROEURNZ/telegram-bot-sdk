@@ -10,19 +10,35 @@ class TelegramCommandService
 
     public function __construct()
     {
-        $this->botToken = config('telegram.bots.mybot.token'); // Ensure your bot token is in the config
+        $this->botToken = config('telegram.bots.mybot.token');
     }
 
     public function setCommandMenu()
     {
         $url = "https://api.telegram.org/bot{$this->botToken}/setMyCommands";
 
-        $commands = [
-            ['command' => 'start', 'description' => 'Start the bot'],
-            ['command' => 'help', 'description' => 'Get help'],
-            ['command' => 'decode', 'description' => 'Decode a barcode or QR code'],
-            // Add more commands as needed
-        ];
+        $commands = array(
+            array(
+                'command' => 'start',
+                'description' => 'Start the bot'
+            ),
+            array(
+                'command' => 'sharecontact',
+                'description' => 'Share your contact infomation'
+            ),
+            array(
+                'command' => 'changelanguage',
+                'description' => 'Change the system language.'
+            ),
+            array(
+                'command' => 'manage',
+                'description' => 'Manage the visits'
+            ),
+            array(
+                'command' => 'help',
+                'description' => 'Get help'
+            ),
+        );
 
         $response = Http::post($url, [
             'commands' => json_encode($commands),
