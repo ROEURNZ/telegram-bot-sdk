@@ -14,8 +14,8 @@ class InlineKeyboard
         $inlineKeyboard = Keyboard::make()
             ->inline()
             ->row([
-                Keyboard::inlineButton(['text' => 'Yes', 'callback_data' => 'yes_contact']),
-                Keyboard::inlineButton(['text' => 'No', 'callback_data' => 'no_contact']),
+                Keyboard::inlineButton(['text' => '✅ Yes', 'callback_data' => 'yes_contact']),
+                Keyboard::inlineButton(['text' => '❌ No', 'callback_data' => 'no_contact']),
             ]);
 
         try {
