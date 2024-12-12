@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LanguageController;
 
@@ -9,6 +10,16 @@ Route::get('/', function () {
 });
 
 Route::get('/switch-locale/{locale}',[LanguageController::class,'swichLocale'])->name('switch-language');
+
+Route::get('/auth/telegram/redirect', function () {
+    return Socialite::driver('telegram')->redirect();
+});
+
+Route::get('/auth/telegram/callback', function () {
+    $user = Socialite::driver('telegram')->user();
+    dd($user);
+});
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');

@@ -39,6 +39,10 @@
                 </a>
             @endif
 
+            <x-primary-link class="ms-3" href="/auth/telegram/redirect">
+                {{ __('Telegram') }}
+            </x-primary-link>
+
             <x-primary-button class="ms-3">
                 {{ __('Log in') }}
             </x-primary-button>
