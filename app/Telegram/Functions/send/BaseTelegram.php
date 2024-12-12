@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace App\Telegram\Functions\Send;
 
 /**
  * BaseTelegramService
  */
-class BaseTelegramService
+class BaseTelegram
 {
     protected $token;
     protected $api_endpoint;

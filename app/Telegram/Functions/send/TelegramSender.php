@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Services;
+namespace App\Telegram\Functions\Send;
 
 use Illuminate\Support\Facades\Log;
+use App\Telegram\Functions\Send\BaseTelegram;
 
 /**
  * TelegramSender
  */
-class TelegramSender extends BaseTelegramService
+class TelegramSender extends BaseTelegram
 {
 
     /**
@@ -40,7 +41,7 @@ class TelegramSender extends BaseTelegramService
         curl_setopt($handle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
         if ($useCA) {
-            curl_setopt($handle, CURLOPT_CAINFO, __DIR__ . "/cacert.pem");
+            curl_setopt($handle, CURLOPT_CAINFO, __DIR__ . '/../../../Services/cacert.pem');
         }
 
         // Set the cURL options for POST fields

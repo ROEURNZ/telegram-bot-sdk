@@ -1,45 +1,13 @@
 <?php
 
-namespace App\Services;
+namespace App\Telegram\Functions\Send;
 
 
-/**
- * TelegramBot
- */
-class TelegramBot
+
+use App\Telegram\Functions\Send\BaseTelegram;
+
+class sendPhoto extends BaseTelegram
 {
-    protected $token;
-    protected $api_endpoint;
-    protected $headers;
-
-    /**
-     * __construct
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->token        = env('TELEGRAM_BOT_TOKEN');
-        $this->api_endpoint = env('TELEGRAM_API_ENDPOINT');
-        $this->setHeaders();
-    }
-
-    /**
-     * setHeaders
-     *
-     * @return void
-     */
-    protected function setHeaders()
-    {
-
-        $this->headers = [
-            "Content-Type"  => "application/json",
-            "Accept"        => "application/json",
-        ];
-    }
-
-
-
     public function sendPhoto(string $photo, string $chat_id, string $caption = '', string $parse_mode = 'HTML'): array
     {
         // Prepare the parameters
@@ -70,7 +38,7 @@ class TelegramBot
         }
 
         // Prepare the API URL for sending the photo (assuming you have a $url for the API endpoint)
-        $url = 'https://api.telegram.org/bot' . env('TELEGRAM_BOT_TOKEN') . '/sendPhoto';
+        $url = "{$this->api_endpoint}/bot{$this->token}/sendPhoto";
 
         // Initialize cURL
         $handle = curl_init($url);
@@ -79,7 +47,7 @@ class TelegramBot
         curl_setopt($handle, CURLOPT_TIMEOUT, 60);
         curl_setopt($handle, CURLOPT_POST, true);
         curl_setopt($handle, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($handle, CURLOPT_CAINFO, __DIR__ . "/cacert.pem");
+        curl_setopt($handle, CURLOPT_CAINFO, __DIR__ . '/../../../Services/cacert.pem');
 
         // Execute the request and capture the response
         $response = curl_exec($handle);
@@ -103,7 +71,4 @@ class TelegramBot
 
         return ['success' => false, 'error' => $decodedResponse['description'] ?? 'Unknown error'];
     }
-
-
-
 }
