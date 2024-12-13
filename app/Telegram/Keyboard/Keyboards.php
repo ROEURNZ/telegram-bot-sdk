@@ -2,12 +2,13 @@
 
 namespace App\Telegram\Keyboard;
 
-use App\Services\TelegramSender;
 use Telegram\Bot\Keyboard\Keyboard;
 use App\Services\BaseTelegramService;
 use Telegram\Bot\Laravel\Facades\Telegram;
+use App\Telegram\Functions\Send\TelegramSender;
+use App\Telegram\Functions\Send\BaseTelegram;
 
-class Keyboards extends BaseTelegramService
+class Keyboards extends BaseTelegram
 {
     protected $telegramSender;
 
