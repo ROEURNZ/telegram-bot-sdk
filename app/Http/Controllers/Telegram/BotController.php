@@ -47,28 +47,13 @@ class BotController extends Controller
             if ($text === '/start') {
                 
             app('usercommandmenu')->setCommandMenu();
-
-
-                $welcomeMessage = "Welcome to the e-Trax System bot, <b>{$firstName} {$lastName}</b>";
-
-                // Cache the chat_id to mark that the user has received the welcome message
                 cache()->put("chat_id_{$chatId}", true, now()->addMinutes(60));
 
                 // Send the welcome photo with caption
-                $photoPath = public_path('images/app.png');
                 $video = public_path('videos/app.mp4');
-                $pcaption = 'Welcome to the e-Trax System bot! 🤖';
                 $vcaption = 'Welcome to E TRAX time attendance bot. Please use start button or /start to join our system.';
-
-                // For Send Video for real usage
                 // $result = app('sendvideo')->sendVideo($video, $chatId, $vcaption);
-
-                // For Send Text Message for fast test
                 $result = app('sendmessage')->sendMessages($vcaption, $chatId);
-
-                // For Send Photo Test 2
-                // $result = app('sendphoto')->sendPhoto($photoPath, $chatId, $pcaption);
-
 
                 if ($result['success']) {
                     return response()->json(['message' => 'Photo sent successfully!']);
@@ -76,7 +61,6 @@ class BotController extends Controller
                     Log::error('Failed to send photo: ' . $result['error']);
                     return response()->json(['error' => 'Failed to send photo'], 500);
                 }
-                // $result =
             }
 
             if ($text == '/manage') {
