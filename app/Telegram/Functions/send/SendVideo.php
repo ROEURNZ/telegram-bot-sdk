@@ -1,45 +1,12 @@
 <?php
 
-namespace App\Services;
+namespace App\Telegram\Functions\Send;
 
+use App\Telegram\Functions\Send\BaseTelegram;
 
+class SendVideo extends BaseTelegram
 
-/**
- * TelegramBot
- */
-class TelegramBot
 {
-    protected $token;
-    protected $api_endpoint;
-    protected $headers;
-
-    /**
-     * __construct
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->token        = env('TELEGRAM_BOT_TOKEN');
-        $this->api_endpoint = env('TELEGRAM_API_ENDPOINT');
-        $this->setHeaders();
-    }
-
-    /**
-     * setHeaders
-     *
-     * @return void
-     */
-    protected function setHeaders()
-    {
-
-        $this->headers = [
-            "Content-Type"  => "application/json",
-            "Accept"        => "application/json",
-        ];
-    }
-
-
 
     public function sendVideo(string $video, string $chat_id, string $caption = '', string $parse_mode = 'HTML'): array
     {
@@ -68,8 +35,7 @@ class TelegramBot
         }
 
         // API endpoint for sending video
-        $url = 'https://api.telegram.org/bot' . env('TELEGRAM_BOT_TOKEN') . '/sendVideo';
-
+        $url = "{$this->api_endpoint}/bot{$this->token}/sendVideo";
         // Initialize cURL
         $handle = curl_init($url);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
@@ -78,7 +44,7 @@ class TelegramBot
         curl_setopt($handle, CURLOPT_POST, true);
         curl_setopt($handle, CURLOPT_POSTFIELDS, $params);
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($handle, CURLOPT_CAINFO, __DIR__ . '/cacert.pem'); // Path to CA certificate
+        curl_setopt($handle, CURLOPT_CAINFO, __DIR__ . '/../../../Services/cacert.pem'); // Path to CA certificate
 
         // Execute the request
         $response = curl_exec($handle);

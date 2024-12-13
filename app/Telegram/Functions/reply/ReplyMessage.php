@@ -1,45 +1,33 @@
 <?php
 
-namespace App\Services;
+namespace App\Telegram\Functions\Reply;
 
+use App\Telegram\Functions\Send\BaseTelegram;
+use App\Telegram\Functions\Send\TelegramSender;
 use Illuminate\Support\Facades\Log;
 
 /**
- * TelegramBot
+ * ReplyText
  */
-class TelegramBot
+class ReplyMessage extends BaseTelegram
 {
-    protected $token;
-    protected $api_endpoint;
-    protected $headers;
 
-    /**
-     * __construct
-     *
-     * @return void
-     */
+    protected $telegramSender;
+
     public function __construct()
     {
-        $this->token        = env('TELEGRAM_BOT_TOKEN');
-        $this->api_endpoint = env('TELEGRAM_API_ENDPOINT');
-        $this->setHeaders();
+        $this->telegramSender = new TelegramSender($this->token, $this->api_endpoint, $this->headers);
     }
+
 
     /**
-     * setHeaders
+     * replyMessage
      *
-     * @return void
+     * @param string $text
+     * @param string $chat_id
+     * @param int $reply_to_message_id
+     * @return array
      */
-    protected function setHeaders()
-    {
-
-        $this->headers = [
-            "Content-Type"  => "application/json",
-            "Accept"        => "application/json",
-        ];
-    }
-
-
     public function replyMessage($text, $chat_id, $reply_to_message_id)
     {
         Log::info('replyMessage: Function called', [
@@ -57,7 +45,7 @@ class TelegramBot
         Log::info('replyMessage: Parameters prepared', ['params' => $params]);
 
         // Call the sendMessage function
-        $result = $this->sendMessage($params, 'sendMessage');
+        $result = $this->telegramSender->sendRequest($params, 'sendMessage');
 
         if ($result['success']) {
             Log::info('replyMessage: Message sent successfully', ['result' => $result]);

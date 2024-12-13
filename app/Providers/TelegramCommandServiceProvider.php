@@ -6,22 +6,25 @@ namespace App\Providers;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
-// From Services
 
-use App\Services\TelegramCommandService;
+// From Commands
+use App\Telegram\Commands\StartCommand;
+use App\Telegram\Commands\ManageVisit\ManageVisitCommand;
 
-
-class TelegramServiceProvider extends ServiceProvider
+class TelegramCommandServiceProvider extends ServiceProvider
 {
     public function register()
     {
         URL::forceScheme('https');
-        // create a singleton.
-        $this->app->singleton('usercommandmenu', fn () => new TelegramCommandService());
+
+        $this->app->singleton('start_command', fn () => new StartCommand());
+        $this->app->singleton('manage_visit', fn () => new ManageVisitCommand());
+
     }
 
     public function boot()
     {
+
         if (env('APP_ENV') == 'local') {
             URL::forceScheme('https');
         }
