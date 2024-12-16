@@ -6,7 +6,7 @@ namespace App\Telegram\Queries;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
-class CallbackHandler
+class CallbackShareContact
 {
     public function handleCallback($request)
     {
@@ -28,7 +28,7 @@ class CallbackHandler
                 $messageText = '';
                 if ($data === 'yes_contact') {
                     $messageText = 'Yes.';
-                    $result = app('btn-contact')->shareContactButton($chatId);
+                    $result = app('shareContactButton')->shareContactButton($chatId);
                 } elseif ($data === 'no_contact') {
                     $messageText = 'You skipped sharing your contact info.';
                 }

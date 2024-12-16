@@ -17,7 +17,10 @@ class TelegramServiceProvider extends ServiceProvider
     {
         URL::forceScheme('https');
         // create a singleton.
-        $this->app->singleton('usercommandmenu', fn () => new TelegramCommandService());
+        
+        $this->app->singleton('usercommandmenu', function () {
+            return new TelegramCommandService();
+        });
     }
 
     public function boot()

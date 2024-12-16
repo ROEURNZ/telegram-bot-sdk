@@ -19,9 +19,9 @@ class TelegramKeyboardServiceProvider extends ServiceProvider
     {
         URL::forceScheme('https');
 
-        $this->app->singleton('inline_keyboard', fn () => new InlineKeyboard());
-        $this->app->singleton('btn-contact',     fn () => new ShareContactButton());
-        $this->app->singleton('system_buttons',  fn () => new Keyboards());
+        $this->app->singleton('requestShareContact', fn () => new InlineKeyboard());
+        $this->app->singleton('shareContactButton',     fn () => new ShareContactButton());
+        $this->app->singleton('buttonSelectLanguage',  fn () => new Keyboards());
     }
 
     public function boot()

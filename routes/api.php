@@ -6,8 +6,7 @@ use App\Services\TelegramCommandService;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use App\Http\Controllers\Telegram\BotController;
 use App\Http\Controllers\Telegram\TelegramController;
-
-
+use App\Http\Controllers\Telegram\UserContactController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -15,22 +14,18 @@ Route::get('/user', function (Request $request) {
 
 
 // Telegram webhooks
-    Route::prefix('telegram/webhooks')->group(function () {
-        // Route::post('inbound',function(Request $request){
-        //     Log::info($request->all());
-        // });
+Route::prefix('telegram/webhook')->group(function () {
 
-        Route::post('system', [BotController::class, 'system'])->name('telegram.system');
-        Route::get('/system-menu', function (TelegramCommandService $telegramService) {
-            return $telegramService->setCommandMenu();
-        });
-        // Route::post('inbound', [TelegramController::class, 'inbound'])->name('telegram.inbound');
+    Route::post('system', [BotController::class, 'system'])->name('telegram.system');
+    Route::post('system1', [UserContactController::class, 'shareContactHandler'])->name('telegram.system1');
+    Route::get('/system-menu', [TelegramController::class, 'setCommandMenu']);
+    Route::get('/send-test-message', [TelegramController::class, 'sendTestMessage']);
 
-    });
+});
+
+
 
 
 // Route::get('/set-telegram-menu', function (TelegramCommandService $telegramService) {
 //     return $telegramService->setCommandMenu();
 // });
-
-

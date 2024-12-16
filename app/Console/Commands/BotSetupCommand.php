@@ -30,7 +30,7 @@ class BotSetupCommand extends Command
         $telegram = new Api(config('telegram.bots.mybot.token'));
         $webhookUrl = config('telegram.bots.mybot.webhook_url');
 
-        $url = sprintf('%s/api/telegram/webhooks/system', $webhookUrl);
+        $url = sprintf('%s/api/telegram/webhook/system', $webhookUrl);
 
         try {
             $response = $telegram->setWebhook(['url' => $url]);

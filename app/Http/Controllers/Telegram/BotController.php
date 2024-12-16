@@ -4,16 +4,87 @@ namespace App\Http\Controllers\Telegram;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use App\Telegram\Queries\CallbackShareContact;
+
+class BotController extends Controller
+{
+    protected $callbackHandler;
+    protected $userContactController;
+    protected $botLanguageController;
+
+    public function __construct(
+        CallbackShareContact $callbackHandler,
+        UserContactController $userContactController,
+        BotLanguageController $botLanguageController
+    ) {
+        $this->callbackHandler = $callbackHandler;
+        $this->userContactController = $userContactController;
+        $this->botLanguageController = $botLanguageController;
+    }
+
+    public function system(Request $request)
+    {
+        if (isset($request->message)) {
+            $chatId    = $request->message['chat']['id'];
+            $text      = $request->message['text'] ?? null;
+
+            // Handle the /start command
+            if ($text === '/start') {
+                app('usercommandmenu')->setCommandMenu();
+                cache()->put("chat_id_{$chatId}", true, now()->addMinutes(60));
+
+                $vcaption = 'Welcome to E TRAX time attendance bot. Please use start button or /start to join our system.';
+                $result = app('sendmessage')->sendMessages($vcaption, $chatId);
+                $this->botLanguageController->changeLanguage($chatId);
+
+                return $result['success']
+                    ? response()->json(['message' => 'Photo sent successfully!'])
+                    : response()->json(['error' => 'Failed to send photo'], 500);
+            }
+
+            if ($text === '/sharecontact') {
+                return $this->userContactController->requestContact($chatId);
+            }
+
+            if (isset($request->message['contact'])) {
+                return $this->userContactController->handleContact($request);
+            }
+
+            if ($text === '/changelanguage') {
+                return $this->botLanguageController->changeLanguage($chatId);
+            }
+
+            if ($text === '🇺🇸 𝗘𝗻𝗴𝗹𝗶𝘀𝗵' || $text === '🇰🇭 𝗞𝗵𝗺𝗲𝗿') {
+                return $this->botLanguageController->handleLanguageResponse($chatId, $text);
+            }
+        }
+
+        if (isset($request->callback_query)) {
+            return $this->callbackHandler->handleCallback($request);
+        }
+    }
+
+}
+
+
+
+/*
+
+namespace App\Http\Controllers\Telegram;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 use App\Http\Controllers\Controller;
-use App\Telegram\Queries\CallbackHandler;
+use App\Telegram\Queries\CallbackShareContact;
 
 class BotController extends Controller
 {
 
     protected $callbackHandler;
     // Inject the CallbackHandler via the constructor
-    public function __construct(CallbackHandler $callbackHandler)
+    public function __construct(CallbackShareContact $callbackHandler)
     {
         $this->callbackHandler = $callbackHandler;
     }
@@ -45,7 +116,7 @@ class BotController extends Controller
 
             // Handle the /start command
             if ($text === '/start') {
-                
+
             app('usercommandmenu')->setCommandMenu();
                 cache()->put("chat_id_{$chatId}", true, now()->addMinutes(60));
 
@@ -70,7 +141,7 @@ class BotController extends Controller
             // In BotController's system method
             if ($text === '/sharecontact') {
 
-                $contactService = app('inline_keyboard');
+                $contactService = app('requestShareContact');
                 $contactService->askContactInfo($chatId);
 
                 return response()->json(['message' => 'Contact request sent.']);
@@ -108,12 +179,12 @@ class BotController extends Controller
             //     $result = app('usercommandmenu')->setCommandMenu();
             // }
              elseif ($text === '/changelanguage') {
-                $result = app('system_buttons')->setKeyboards($chatId);
+                $result = app('buttonSelectLanguage')->setKeyboards($chatId);
             }
 
             if ($text === '🇺🇸 𝗘𝗻𝗴𝗹𝗶𝘀𝗵' || $text === '🇰🇭 𝗞𝗵𝗺𝗲𝗿') {
                 // Handle the language selection and remove the keyboard
-                app('system_buttons')->handleUserResponse($chatId, $text);
+                app('buttonSelectLanguage')->handleUserResponse($chatId, $text);
             }
 
 
@@ -125,3 +196,5 @@ class BotController extends Controller
         }
     }
 }
+
+*/
