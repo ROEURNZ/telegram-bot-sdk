@@ -20,7 +20,7 @@ Route::prefix('telegram/webhook')->group(function () {
     Route::post('system1', [UserContactController::class, 'shareContactHandler'])->name('telegram.system1');
     Route::get('/system-menu', [TelegramController::class, 'setCommandMenu']);
     Route::get('/send-test-message', [TelegramController::class, 'sendTestMessage']);
-
+    Route::get('/messages', [BotController::class, 'getMessages']);
 });
 
 
