@@ -22,10 +22,10 @@ class UserCommandMenu
         //     'command' => 'manage',
         //     'description' => 'Manage the visits'
         // ),
-        // array(
-        //     'command' => 'help',
-        //     'description' => 'Get help'
-        // ),
+        array(
+            'command' => 'help',
+            'description' => 'Get help'
+        ),
     );
 
 

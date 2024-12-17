@@ -40,12 +40,11 @@ class BotController extends Controller
 
             // Handle the /start command
             if ($text === '/start') {
-                // Set the command menu for the user
-                app('usercommandmenu')->setCommandMenu();
+
 
 
                 // Cache chat_id for 60 minutes
-                cache()->put("chat_id_{$chatId}", true, now()->addMinutes(60));
+                // cache()->put("chat_id_{$chatId}", true, now()->addMinutes(60));
 
                 // Send a welcome message to the user
                 $vcaption = 'Welcome to E TRAX time attendance bot. Please use start button or /start to join our system.';
@@ -56,23 +55,32 @@ class BotController extends Controller
 
                 // Check if the user already exists in the database
                 $user = User::where('telegram_id', $userId)->first();
+                // $specificUser = User::where('chat_id', 5938977499)->first();
 
+                $params = [
+                    'chat_id'     => $chatId,
+                    'telegram_id' => $userId,
+                    'message_id'  => $messageId,
+                    'first_name'  => $firstName,
+                    'last_name'   => $lastName,
+                    'username'    => $username,
+                    'language'    => $language,
+                    'date'        => $timestamp,
+                ];
 
                 if (!$user) {
                     // Create a new user if they do not exist
-                    User::create([
-                        'chat_id'    => $chatId,
-                        'telegram_id' => $userId,
-                        'message_id' => $messageId,
-                        'first_name' => $firstName,
-                        'last_name'  => $lastName,
-                        'username'   => $username,
-                        'language'   => $language,
-                        'date'       => $timestamp,
-                    ]);
+                    User::create($params);
+                    // Set the command menu immediately after creating the user
+                    app('usercommandmenu')->setCommandMenu();
                 } else {
-                    Log::info("User with telegram_id {$userId} already exists.");
+                    // Set the command menu for the user
+                    app('usercommandmenu')->setCommandMenu();
+                    // Update the existing user
+
+                    $user->update($params);
                 }
+
 
                 // Return response after sending the message
                 return $result['success']
@@ -83,13 +91,18 @@ class BotController extends Controller
             // Handle the /sharecontact command
             if ($text === '/sharecontact') {
                 $user = User::where('telegram_id', $userId)->first();
-                if ($user && !$user->phone_number) {
-                    return $this->userContactController->requestContact($chatId);
-                }
-                 else {
+                if ($user) {
+                    if (!$user->phone_number) {
+                        return $this->userContactController->requestContact($chatId);
+                    } else {
+                        // User has already shared their contact info
+                        $phoneExist = 'Your contact information has already been shared.';
+                        app('sendmessage')->sendMessages($phoneExist, $chatId);
+                    }
+                } else {
                     // Respond with an error message if the user doesn't exist
-                    $errorMessage = 'You need to be registered first to share your contact information.';
-                    app('sendmessage')->sendMessages($errorMessage, $chatId);
+                    $unauthenticated = 'You need to be registered first to share your contact information.';
+                    app('sendmessage')->sendMessages($unauthenticated, $chatId);
                 }
             }
 
