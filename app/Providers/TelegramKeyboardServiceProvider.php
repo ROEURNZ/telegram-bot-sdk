@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 // From Illuminate Support -> System Provider
+
+use App\Telegram\Keyboard\Buttons\ClockInButton;
+use App\Telegram\Keyboard\Buttons\ClockOutButton;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +25,8 @@ class TelegramKeyboardServiceProvider extends ServiceProvider
         $this->app->singleton('requestShareContact', fn () => new InlineKeyboard());
         $this->app->singleton('shareContactButton',     fn () => new ShareContactButton());
         $this->app->singleton('buttonSelectLanguage',  fn () => new Keyboards());
+        $this->app->singleton('buttonClockIn',  fn () => new ClockInButton());
+        $this->app->singleton('buttonClockOut',  fn () => new ClockOutButton());
     }
 
     public function boot()

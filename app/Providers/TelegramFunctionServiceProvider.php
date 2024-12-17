@@ -24,6 +24,7 @@ class TelegramFunctionServiceProvider extends ServiceProvider
 
         $this->app->singleton('sendmessage',  fn () => new SendMessage());
         $this->app->singleton('sendcontact',  fn () => new SendContact());
+        $this->app->singleton('sendbuttonclockin',  fn () => new SendContact());
         $this->app->singleton('replymessage', fn () => new ReplyMessage());
         $this->app->singleton('sendphoto',    fn () => new sendPhoto());
         $this->app->singleton('sendvideo',    fn () => new SendVideo());

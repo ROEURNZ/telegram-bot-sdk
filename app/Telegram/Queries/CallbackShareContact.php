@@ -27,8 +27,7 @@ class CallbackShareContact
 
                 $messageText = '';
                 if ($data === 'yes_contact') {
-                    $messageText = 'Yes.';
-                    $result = app('shareContactButton')->shareContactButton($chatId);
+                    app('shareContactButton')->shareContactButton($chatId);
                 } elseif ($data === 'no_contact') {
                     $messageText = 'You skipped sharing your contact info.';
                 }

@@ -41,4 +41,22 @@ class SendContact extends BaseTelegram
 
         return $result;
     }
+    public function sendButtonClockIn($chatId, $markup, $token, $replyMarkup, $parse_mode = 'HTML')
+    {
+
+        $params = [
+            'chat_id' => $chatId,
+            'text' => $markup,
+            'reply_markup' => $replyMarkup,
+        ];
+
+        if ($parse_mode) {
+            $params['parse_mode'] = $parse_mode;
+        }
+
+        // Send the message
+        $result = $this->telegramSender->sendRequest($params, 'sendMessage');
+
+        return $result;
+    }
 }
