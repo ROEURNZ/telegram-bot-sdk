@@ -79,60 +79,109 @@ class BotController extends Controller
                 return $this->userContactController->handleContact($request);
             }
 
-            // Handle photo upload or selfie
-            if (isset($request->message['photo'])) {
-                Log::info("Photo received from chat ID: {$chatId}");
-                $time = date('h:i A'); // Format time as 12-hour with AM/PM
-                $message = "✅ Clock In Received at {$time}";
+            // ================================
+            // Handle Clock In Start
+            // ================================
+            if ($text === '🟢 Clock In 🟢') {
+                $message = "🗺 Please share your LIVE location to clock in.";
                 app('sendmessage')->sendMessages($message, $chatId);
-                app('buttonClockOut')->clockOutButton($chatId);
 
-                // Save the selfie message ID to the database
-                if (isset($request->message['message_id'])) {
-                    $userClockInOut = UserClockInOut::where('user_id', $chatId)
-                        ->where('clock_in_day', date('Y-m-d')) // Ensure you're updating the correct record for today
-                        ->first();
-
-                    if ($userClockInOut) {
-                        $userClockInOut->clock_in_selfie_msg_id = $request->message['message_id']; // Save the selfie message ID
-                        $userClockInOut->save(); // Save the updated record
-                    }
-                }
+                // Cache state to track that the user is clocking in
+                cache()->put("clock_in_{$chatId}", true, now()->addMinutes(5));
+                cache()->forget("clock_out_{$chatId}"); // Ensure clock-out state is cleared
             }
 
+            // Handle Clock-In location
+            elseif (isset($request->message['location']) && cache()->has("clock_in_{$chatId}")) {
+                $latitude = $request->message['location']['latitude'];
+                $longitude = $request->message['location']['longitude'];
 
-            // Handle Clock-In Location Sharing
-            if (isset($request->message['location'])) {
-                $location = $request->message['location'];
-                $latitude = $location['latitude'];
-                $longitude = $location['longitude'];
-                Log::info("Location: lat: {$latitude}, long: {$longitude}");
+                // Save Clock-In data
+                UserClockInOut::updateOrCreate(
+                    ['user_id' => $chatId, 'clock_in_day' => date('D')],
+                    [
+                        'clock_in_lat' => $latitude,
+                        'clock_in_lon' => $longitude,
+                        'clock_in_location_msg_id' => $request->message['message_id'],
+                        'clock_in_time' => now()->format('H:i'),
+                        'is_clock_in' => 'clock_in',
+                        'clock_in_time_status' => $this->getClockInStatus(now()->format('H:i')),
+                    ]
+                );
 
-                // Calculate the distance from the reference point (e.g., office location)
-                // Example: reference point coordinates (office location)
-                $referenceLat = 12.345678; // Office Latitude
-                $referenceLon = 98.765432; // Office Longitude
 
-                // Calculate distance (e.g., Haversine formula or any other method)
-                $distance = $this->calculateDistance($latitude, $longitude, $referenceLat, $referenceLon);
+                // Send message to request a selfie
+                app('sendmessage')->sendMessages("📷 Please share a selfie to complete clock-in.", $chatId);
+            }
 
-                // Store clock-in data in the database
-                $userClockInOut = new UserClockInOut();
-                $userClockInOut->user_id = $chatId;  // Use chat_id as user_id
-                $userClockInOut->clock_in_day = date('Y-m-d'); // Store today's date
-                $userClockInOut->clock_in_location_status = 'Clocked In'; // Status
-                $userClockInOut->clock_in_lat = $latitude; // Latitude from the location message
-                $userClockInOut->clock_in_lon = $longitude; // Longitude from the location message
-                $userClockInOut->clock_in_location_msg_id = $request->message['message_id']; // Save message ID
-                $userClockInOut->clock_in_time_status = 'On Time'; // Example, could be 'Late' or 'On Time'
-                $userClockInOut->clock_in_time = date('H:i:s'); // Current time of clock-in
-                $userClockInOut->is_clock_in = 'Yes'; // Mark as clocked in
-                $userClockInOut->clock_in_distance = $distance; // Store the calculated distance
-                $userClockInOut->created_at = now(); // Set created timestamp
-                $userClockInOut->save(); // Save the clock-in record
+            // Handle Clock-In Selfie
+            elseif (isset($request->message['photo']) && cache()->has("clock_in_{$chatId}")) {
+                $userClockInOut = UserClockInOut::where('user_id', $chatId)
+                    ->where('clock_in_day', date('D'))
+                    ->first();
 
-                $message = "📷 Please share a selfie to clock in.";
+                if ($userClockInOut) {
+                    $userClockInOut->clock_in_selfie_msg_id = $request->message['message_id'];
+                    $userClockInOut->save();
+
+                    // Confirmation Message
+                    app('sendmessage')->sendMessages("✅ Clock-In completed at " . now()->format('h:i A'), $chatId);
+                    app('buttonClockOut')->clockOutButton($chatId);
+                }
+
+                cache()->forget("clock_in_{$chatId}"); // Clear clock-in state
+            }
+
+            // ================================
+            // Handle Clock Out Start
+            // ================================
+            elseif ($text === '🔴 Clock Out 🔴') {
+                app('buttonClockOut')->clockOutKeyboard($chatId);
+            } elseif ($text === '✅ Yes') {
+                $message = "🗺 Please share your LIVE location to clock in.";
                 app('sendmessage')->sendMessages($message, $chatId);
+                // Cache state to track that the user is clocking out
+                cache()->put("clock_out_{$chatId}", true, now()->addMinutes(5));
+                cache()->forget("clock_in_{$chatId}"); // Ensure clock-in state is cleared
+
+            }
+
+            // Handle Clock-Out location
+            elseif (isset($request->message['location']) && cache()->has("clock_out_{$chatId}")) {
+                $latitude = $request->message['location']['latitude'];
+                $longitude = $request->message['location']['longitude'];
+
+                // Save Clock-Out data
+                $userClockInOut = UserClockInOut::updateOrCreate(
+                    ['user_id' => $chatId, 'clock_in_day' => date('D')],
+                    [
+                        'clock_out_lat' => $latitude,
+                        'clock_out_lon' => $longitude,
+                        'clock_out_location_msg_id' => $request->message['message_id'],
+                        'clock_out_time' => now()->format('H:i'), // Clock-Out Time
+                        'is_clock_in' => 'clock_out',
+                    ]
+                );
+
+                // Send message to request a selfie
+                app('sendmessage')->sendMessages("📷 Please share a selfie to complete clock-out.", $chatId);
+            }
+
+            // Handle Clock-Out Selfie
+            elseif (isset($request->message['photo']) && cache()->has("clock_out_{$chatId}")) {
+                $userClockInOut = UserClockInOut::where('user_id', $chatId)
+                    ->where('clock_in_day', date('D'))
+                    ->first();
+
+                if ($userClockInOut) {
+                    $userClockInOut->clock_in_selfie_msg_id = $request->message['message_id'];
+                    $userClockInOut->save();
+
+                    // Confirmation Message
+                    app('sendmessage')->sendMessages("☑️ Clock-Out completed at " . now()->format('h:i A'), $chatId);
+                }
+
+                cache()->forget("clock_out_{$chatId}"); // Clear clock-out state
             }
 
 
@@ -146,15 +195,6 @@ class BotController extends Controller
             if ($text === '/changelanguage') {
                 return $this->botLanguageController->changeLanguage($chatId);
             }
-
-            if ($text === '🟢 Clock In 🟢') {
-                $message = "🗺 Please share your LIVE location to clock in.";
-                app('sendmessage')->sendMessages($message, $chatId);
-            }
-            if ($text === '🔴 Clock Out 🔴') {
-                $message = "🗺 Please share your LIVE location to clock in.";
-                app('sendmessage')->sendMessages($message, $chatId);
-            }
         }
 
         // Handle callback queries if present
@@ -162,23 +202,9 @@ class BotController extends Controller
             return $this->callbackHandler->handleCallback($request);
         }
     }
-    // Method to calculate distance between two lat/lon points using Haversine formula (or any other method you prefer)
-    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    private function getClockInStatus($currentTime)
     {
-        $earthRadius = 6371; // Earth radius in kilometers
-        $latFrom = deg2rad($lat1);
-        $lonFrom = deg2rad($lon1);
-        $latTo = deg2rad($lat2);
-        $lonTo = deg2rad($lon2);
-
-        $latDiff = $latTo - $latFrom;
-        $lonDiff = $lonTo - $lonFrom;
-
-        $a = sin($latDiff / 2) * sin($latDiff / 2) +
-            cos($latFrom) * cos($latTo) *
-            sin($lonDiff / 2) * sin($lonDiff / 2);
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-
-        return $earthRadius * $c; // Distance in kilometers
+        $workStartTime = '09:00'; // Example start time
+        return $currentTime > $workStartTime ? 'LATE' : 'ON TIME';
     }
 }
