@@ -55,7 +55,6 @@ class BotController extends Controller
 
                 // Check if the user already exists in the database
                 $user = User::where('telegram_id', $userId)->first();
-                // $specificUser = User::where('chat_id', 5938977499)->first();
 
                 $params = [
                     'chat_id'     => $chatId,

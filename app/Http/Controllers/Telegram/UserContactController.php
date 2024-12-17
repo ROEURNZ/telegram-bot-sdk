@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Telegram;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Telegram\Queries\CallbackShareContact;
 
