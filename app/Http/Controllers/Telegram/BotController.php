@@ -151,6 +151,10 @@ class BotController extends Controller
                 $message = "🗺 Please share your LIVE location to clock in.";
                 app('sendmessage')->sendMessages($message, $chatId);
             }
+            if ($text === '🔴 Clock Out 🔴') {
+                $message = "🗺 Please share your LIVE location to clock in.";
+                app('sendmessage')->sendMessages($message, $chatId);
+            }
         }
 
         // Handle callback queries if present
