@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            
             // For Telegram bot
-            $table->unsignedBigInteger('chat_id')->unique();
-            $table->unsignedBigInteger('telegram_id')->unique();
+            $table->unsignedBigInteger('chat_id')->unique(); // chat.id for user's chat id
+            $table->unsignedBigInteger('telegram_id')->unique(); // from.id telegram user id
             $table->integer('message_id');
             $table->string('first_name');
             $table->string('last_name')->nullable();
@@ -47,7 +48,7 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             $table->longText('payload');
             $table->integer('last_activity')->index();
-            $table->softDeletes(); 
+            $table->softDeletes();
         });
     }
 

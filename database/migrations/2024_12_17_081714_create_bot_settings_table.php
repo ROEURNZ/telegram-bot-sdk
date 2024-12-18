@@ -24,7 +24,7 @@ return new class extends Migration
             $table->tinyInteger('module_alert')->default(0);
             $table->tinyInteger('module_break')->default(0);
             $table->integer('clockout_reminder_interval');
-            $table->integer('clockout_reminder_timeout');
+            $table->integer('clockout_reminder_time  out');
             $table->timestamps();
         });
     }

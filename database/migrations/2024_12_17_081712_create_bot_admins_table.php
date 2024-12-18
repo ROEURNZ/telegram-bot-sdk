@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('step', 100)->nullable();
             $table->text('temp')->nullable();
             $table->timestamps();
+            $table->softDeletes(); 
         });
     }
 

@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('user_clock_in_out', function (Blueprint $table) {
+        Schema::create('user_clock_ins', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id');
             $table->string('clock_type', 10);
@@ -23,6 +23,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('user_clock_in_out');
+        Schema::dropIfExists('user_clock_ins');
     }
 };

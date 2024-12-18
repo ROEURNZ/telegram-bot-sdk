@@ -120,17 +120,12 @@ class BotController extends Controller
                 return $this->botLanguageController->handleLanguageResponse($chatId, $text);
             }
 
-            // Save or update user data in the database
-
-
-
         }
 
         // Handle callback queries if present
         if (isset($request->callback_query)) {
             return $this->callbackHandler->handleCallback($request);
         }
-
         return response()->json(['message' => 'Invalid request.']);
     }
 }
