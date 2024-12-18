@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Cache;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
 use App\Helpers\EnvDrivenHelper;
-
+use Illuminate\Support\Facades\Log;
+use Telegram\Bot\Keyboard\Keyboard;
 
 class ManageVisitCommand extends EnvDrivenHelper
 {
@@ -32,27 +33,22 @@ class ManageVisitCommand extends EnvDrivenHelper
      */
     public function sendStartVisitOptions($chatId)
     {
-        $url = "{$this->api_endpoint}/bot{$this->token}/sendMessage";
+        $inlineKeyboard = Keyboard::make()
+            ->inline()
+            ->row([
+                Keyboard::inlineButton(['text' => '🚶 Start Visit', 'callback_data' => 'startvisit']),
+            ]);
 
-        $keyboard = [
-            'inline_keyboard' => [
-                [
-                    ['text' => 'Start Visit', 'callback_data' => 'startvisit']
-                ]
-            ]
-        ];
-
-        $response = Http::post($url, [
-            'chat_id' => $chatId,
-            'text' => 'Do you want to start your visit?',
-            'reply_markup' => json_encode($keyboard),
-        ]);
-
-        if ($response->successful()) {
-            Cache::put('visit_started_' . $chatId, true, 3600); // Mark visit as started for 1 hour
+        try {
+            // Send a message with the inline keyboard
+            Telegram::sendMessage([
+                'chat_id' => $chatId,
+                'text' => 'Do you want to start your visit?',
+                'reply_markup' => json_encode($inlineKeyboard),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error sending inline keyboard: ' . $e->getMessage());
         }
-
-        return $response->successful() ? "Start visit options sent." : "Failed to send options: " . $response->body();
     }
 
     /**
@@ -60,23 +56,22 @@ class ManageVisitCommand extends EnvDrivenHelper
      */
     public function sendEndVisitOptions($chatId)
     {
-        $url = "{$this->api_endpoint}/bot{$this->token}/sendMessage";
+        $inlineKeyboard = Keyboard::make()
+            ->inline()
+            ->row([
+                Keyboard::inlineButton(['text' => '☑️ End Visit', 'callback_data' => 'endvisit']),
+            ]);
 
-        $keyboard = [
-            'inline_keyboard' => [
-                [
-                    ['text' => 'End Visit', 'callback_data' => 'endvisit']
-                ]
-            ]
-        ];
-
-        $response = Http::post($url, [
-            'chat_id' => $chatId,
-            'text' => 'Your visit has started. Do you want to end it?',
-            'reply_markup' => json_encode($keyboard),
-        ]);
-
-        return $response->successful() ? "End visit options sent." : "Failed to send options: " . $response->body();
+        try {
+            // Send a message with the inline keyboard
+            Telegram::sendMessage([
+                'chat_id' => $chatId,
+                'text' => 'Do you want to end visit?',
+                'reply_markup' => json_encode($inlineKeyboard),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error sending inline keyboard: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -146,6 +141,4 @@ class ManageVisitCommand extends EnvDrivenHelper
 
         return $response->successful() ? "Unknown command." : "Failed to process command.";
     }
-
-
 }

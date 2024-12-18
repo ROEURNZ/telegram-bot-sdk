@@ -48,4 +48,10 @@ class ClockOutButton
             'reply_markup' => $reply_markup,
         ]);
     }
+
+    public function getClockOutStatus($currentTime)
+    {
+        $workStartTime = '05:00'; // Example start time
+        return $currentTime > $workStartTime ? 'EARLY CLOCK OUT' : 'ON TIME';
+    }
 }

@@ -32,21 +32,10 @@ class ClockInButton
         }
     }
 
-    public function handleLocation($update)
+
+    public function getClockInStatus($currentTime)
     {
-        // Get the location data from the update
-        $location = $update->getMessage()->getLocation();
-        $latitude = $location->getLatitude();
-        $longitude = $location->getLongitude();
-
-        // You can save the location in the database or take some action here
-        Log::info('User shared location: Latitude - ' . $latitude . ', Longitude - ' . $longitude);
-
-        // Optionally, you can send a confirmation message to the user
-        $chatId = $update->getMessage()->getChat()->getId();
-        Telegram::sendMessage([
-            'chat_id' => $chatId,
-            'text' => 'Thank you! You have successfully clocked in.',
-        ]);
+        $workStartTime = '09:00'; // Example start time
+        return $currentTime > $workStartTime ? 'LATE' : 'ON TIME';
     }
 }
