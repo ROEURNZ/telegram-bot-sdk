@@ -15,17 +15,17 @@ class UserClockInOut extends Model
     // Define the fillable attributes for mass assignment
     protected $fillable = [
         'user_id',
-        'clock_in_day',
-        'clock_in_location_status',
-        'clock_in_lat',
-        'clock_in_lon',
-        'clock_in_location_msg_id',
-        'clock_in_distance',
-        'clock_in_time_status',
-        'clock_in_time',
+        'clock_day',
+        'clock_location_status',
+        'clock_lat',
+        'clock_lon',
+        'clock_location_msg_id',
+        'clock_distance',
+        'clock_time_status',
+        'clock_time',
         'work_start_time',
-        'clock_in_selfie_msg_id',
-        'is_clock_in',
+        'clock_selfie_msg_id',
+        'clock_status',
         'created_at',
     ];
 
