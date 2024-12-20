@@ -1,30 +1,30 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Telegram;
 
-
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+class TelegramUser extends Model
 {
     use HasFactory, Notifiable, SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+
+    protected $table = 'telegram_users';
+    
     protected $fillable = [
+        'chat_id',
+        'telegram_id',
+        'message_id',
         'first_name',
         'last_name',
-        'email',
-        'password',
-        'locale',
+        'username',
+        'phone_number',
+        'language',
+        'date',
     ];
-
 
     protected $dates = [
         'deleted_at'
@@ -51,5 +51,8 @@ class User extends Authenticatable
     ];
 
 
-
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id', 'id');
+    }
 }

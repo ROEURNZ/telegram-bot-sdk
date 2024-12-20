@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.4",
         "livewire/volt": "^1.0",
+        "socialiteproviders/telegram": "^4.1",
         "telegram-bot/api": "^2.5"
     },
     "require-dev": {

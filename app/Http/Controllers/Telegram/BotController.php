@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\Telegram\TelegramUser;
 use App\Telegram\Queries\CallbackShareContact;
 
 class BotController extends Controller
@@ -42,19 +43,40 @@ class BotController extends Controller
             if ($text === '/start') {
 
 
+                $user = TelegramUser::where('telegram_id', $userId)->first();
 
                 // Cache chat_id for 60 minutes
                 // cache()->put("chat_id_{$chatId}", true, now()->addMinutes(60));
 
                 // Send a welcome message to the user
-                $vcaption = 'Welcome to E TRAX time attendance bot. Please use start button or /start to join our system.';
-                $result = app('sendmessage')->sendMessages($vcaption, $chatId);
+                $welcome = 'Welcome to the E-TRAX System! You can interact with me now.';
+
+
+                if (isset($user->telegram_id)) {
+                    $welcome2 = sprintf(
+                        'Welcome, <strong>%s %s</strong>! Glad to have you here!',
+                        $user->first_name,
+                        $user->last_name,
+                    );
+                    $result = app('sendmessage')->sendMessages($welcome2, $chatId);
+                } else {
+                    $result = app('sendmessage')->sendMessages($welcome, $chatId);
+                }
 
                 // Change the language if necessary
-                $this->botLanguageController->changeLanguage($chatId);
+
+                if (empty($user->language)) {
+                    $this->botLanguageController->selectLanguage($chatId);
+                }
+
+                // $users = User::all();
+                // Log::info('hhhhhhhhhhhhh ' . json_encode($users));
+                // $userCount = User::count();
+                // Log::info("Number of users: {$userCount}");
+
+
 
                 // Check if the user already exists in the database
-                $user = User::where('telegram_id', $userId)->first();
 
                 $params = [
                     'chat_id'     => $chatId,
@@ -69,7 +91,7 @@ class BotController extends Controller
 
                 if (!$user) {
                     // Create a new user if they do not exist
-                    User::create($params);
+                    TelegramUser::create($params);
                     // Set the command menu immediately after creating the user
                     app('usercommandmenu')->setCommandMenu();
                 } else {
@@ -77,7 +99,7 @@ class BotController extends Controller
                     app('usercommandmenu')->setCommandMenu();
                     // Update the existing user
 
-                    $user->update($params);
+                    // $user->update($params);
                 }
 
 
@@ -89,9 +111,9 @@ class BotController extends Controller
 
             // Handle the /sharecontact command
             if ($text === '/sharecontact') {
-                $user = User::where('telegram_id', $userId)->first();
+                $user = TelegramUser::where('telegram_id', $userId)->first();
                 if ($user) {
-                    if (!$user->phone_number) {
+                    if (empty($user->phone_number)) {
                         return $this->userContactController->requestContact($chatId);
                     } else {
                         // User has already shared their contact info
@@ -112,14 +134,17 @@ class BotController extends Controller
 
             // Handle the /changelanguage command
             if ($text === '/changelanguage') {
-                return $this->botLanguageController->changeLanguage($chatId);
+                $user = TelegramUser::where('telegram_id', $userId)->first();
+
+                if ($user && isset($user->language)) {
+                    return $this->botLanguageController->changeLanguage($chatId);
+                }
             }
 
             // Handle language selection (English or Khmer)
             if ($text === '🇺🇸 𝗘𝗻𝗴𝗹𝗶𝘀𝗵' || $text === '🇰🇭 𝗞𝗵𝗺𝗲𝗿') {
                 return $this->botLanguageController->handleLanguageResponse($chatId, $text);
             }
-
         }
 
         // Handle callback queries if present

@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 
 class BotLanguageController extends Controller
 {
+    public function selectLanguage($chatId)
+    {
+        $result = app('buttonSelectLanguage')->setKeyboards($chatId);
+        return response()->json(['message' => 'Language selection keyboard sent.']);
+    }
     public function changeLanguage($chatId)
     {
         $result = app('buttonSelectLanguage')->setKeyboards($chatId);

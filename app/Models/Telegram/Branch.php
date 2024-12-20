@@ -2,6 +2,7 @@
 
 namespace App\Models\Telegram;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -11,16 +12,21 @@ class Branch extends Model
 
     protected $table = 'branch';
     protected $fillable = [
-        'branch_name',
+        'name',
+        'company_id',
         'branch_lat',
         'branch_lon',
     ];
 
     public $timestamps = false;
 
-    // A Branch has many users (assuming employees are assigned to branches)
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id', 'id');
+    }
+
     public function users()
     {
-        return $this->hasMany(UserProfile::class);
+        return $this->hasMany(User::class, 'branch_id', 'id');
     }
 }

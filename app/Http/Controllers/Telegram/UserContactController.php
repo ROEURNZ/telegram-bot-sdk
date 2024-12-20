@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Telegram;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Telegram\TelegramUser;
 use App\Telegram\Queries\CallbackShareContact;
 
 class UserContactController extends Controller
@@ -56,7 +57,7 @@ class UserContactController extends Controller
         );
 
         // Check if the user exists by chat_id
-        $user = User::where('chat_id', $chatId)->first();
+        $user = TelegramUser::where('chat_id', $chatId)->first();
 
         if ($user) {
             // If phone_number is already set, update it
@@ -65,7 +66,7 @@ class UserContactController extends Controller
             }
             else {
                 // If phone doesn't exist, create a new phone_number
-                User::create([
+                TelegramUser::create([
                     'phone_number' => $phoneNumber,
                 ]);
             }
