@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->tinyInteger('permission')->default(1)->nullable();
             $table->enum('language', ['en', 'kh'])->default('en');
-            $table->timestamp('date')->nullable();
+            $table->timestamp('date')->nullable(); 
 
             // Timestamps
             $table->timestamps();

@@ -69,12 +69,23 @@ class BotController extends Controller
                     $this->botLanguageController->selectLanguage($chatId);
                 }
 
-                // $users = User::all();
-                // Log::info('hhhhhhhhhhhhh ' . json_encode($users));
-                // $userCount = User::count();
-                // Log::info("Number of users: {$userCount}");
+                $userId = 5938977499;  // Example chat_id you want to delete
 
+                $deletUser = TelegramUser::where('telegram_id', $userId)->first();
 
+                if ($deletUser) {
+                    $deletUser->delete();
+                    Log::info("User with chat_id {$userId} has been deleted.");
+                } else {
+                    Log::info("No user found with chat_id {$userId}.");
+                }
+
+                $users = TelegramUser::all();
+                if ($users->isNotEmpty()) {
+                    Log::info('Is there any user: ' . json_encode($users));
+                    $userCount = $users->count();
+                    Log::info("Number of users: {$userCount}");
+                }
 
                 // Check if the user already exists in the database
 
